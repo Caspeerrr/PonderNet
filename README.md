@@ -12,6 +12,8 @@ The experiment in the paper can be reproduced by running the following command. 
 sh run_extrapolation.sh 5
 ```
 
+To optimize training time make sure to choose the right amount of gpus in `run_extrapolation.py`.
+
 
 ### Transformations
 The different transformations tested with 5 different severities are:
@@ -22,6 +24,12 @@ The different transformations tested with 5 different severities are:
 - Rotation transform
 
 Additional transformations can be added by implementing them in `augmentations.py`.
+
+### Hyperparameters
+All the hyperparameters are configured in `config.py`.
+
+### Dataset
+To choose a different dataset instead of `CIFAR10`, make sure to eidt the dataset name in `run_extrapolation.py`, and to choose the correct input size depending on the image size in `pondernet.py`.
 # Citation
 If you use this code to produce results for your scientific publication, or if you share a copy or fork, please cite us in the following way:
 
