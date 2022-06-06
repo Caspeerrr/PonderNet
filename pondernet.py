@@ -86,8 +86,6 @@ class PonderMNIST(pl.LightningModule):
         # metrics
         self.accuracy = torchmetrics.Accuracy()
 
-        # save hparams on W&B
-        self.save_hyperparameters()
 
     def forward(self, x):
         '''
@@ -243,11 +241,8 @@ class PonderMNIST(pl.LightningModule):
         _, _, acc, steps = self._get_loss_and_metrics(batch)
 
         # logging
-        f = open('results.txt', 'a')
-        f.write(f'test_{dataset_idx}/steps {steps}\n')
-        f.write(f'test_{dataset_idx}/steps {acc}\n')
-
-        f.close()
+        self.log(f'test_{dataset_idx}/steps', steps)
+        self.log(f'test_{dataset_idx}/accuracy', acc)
 
     def configure_optimizers(self):
         '''

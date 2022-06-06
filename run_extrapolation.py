@@ -1,10 +1,13 @@
 import pytorch_lightning as pl
-from pytorch_lightning import Trainer
+from pytorch_lightning import Trainer, loggers
 import argparse
 
 from pondernet import PonderMNIST
 from data import DataModule, get_transforms
 from torchvision.datasets import MNIST, CIFAR10
+import sys
+import os 
+
 
 from config import(
     BATCH_SIZE,
@@ -24,10 +27,15 @@ def main(seed, data):
     # set seeds
     pl.seed_everything(seed)
 
+    os.makedirs('results', exist_ok=True) 
+    f = open(f"results/extrapolation{seed}.txt", 'w')
+    sys.stdout = f
+
+
     test_transform = get_transforms()
 
     # initialize datamodule and model
-    mnist = DataModule(batch_size=BATCH_SIZE,
+    DATA = DataModule(batch_size=BATCH_SIZE,
                             test_transform=test_transform,
                             dataset=data)
     model = PonderMNIST(n_hidden=N_HIDDEN,
@@ -39,8 +47,13 @@ def main(seed, data):
                         beta=BETA,
                         lr=LR)
 
+    logger = loggers.TensorBoardLogger(save_dir='logs',
+                                       version=seed,
+                                       name='extrapolation')
+
 
     trainer = Trainer(
+        logger=logger,
         gpus=-1,                            # use all available GPU's
         max_epochs=EPOCHS,                  # maximum number of epochs
         gradient_clip_val=GRAD_NORM_CLIP,   # gradient clipping
@@ -49,10 +62,12 @@ def main(seed, data):
         # precision=16,                       # train in half precision
 
     # fit the model
-    trainer.fit(model, datamodule=mnist)
+    trainer.fit(model, datamodule=DATA)
 
     # evaluate on the test set
-    trainer.test(model, datamodule=mnist)
+    trainer.test(model, datamodule=DATA)
+
+    f.close()
 
 
 if __name__ == "__main__":
@@ -65,6 +80,8 @@ if __name__ == "__main__":
         data = CIFAR10
     elif args.data == 'MNIST':
         data = MNIST
+    else:
+        data = CIFAR10
 
     main(float(args.seed), data)
    

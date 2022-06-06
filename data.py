@@ -8,13 +8,13 @@ from augmentations import gaussian_noise_transform, gaussian_blur_transform, con
 
 class DataModule(pl.LightningDataModule):
     '''
-        DataModule to hold the MNIST dataset. Accepts different transforms for train and test to
+        DataModule to hold the MNIST/CIFAR10 dataset. Accepts different transforms for train and test to
         allow for extrapolation experiments.
 
         Parameters
         ----------
         data_dir : str
-            Directory where MNIST will be downloaded or taken from.
+            Directory where MNIST/CIFAR10 will be downloaded or taken from.
 
         train_transform : [transform] 
             List of transformations for the training dataset. The same
@@ -148,9 +148,10 @@ def get_transforms():
 
         test_transform.extend([transform_gnt, transform_gbt, transform_ct, transform_jt, transform_rt])
 
-    f = open('results.txt', 'a')
-    for line in names:
-        f.write(line, '\n')
+    f = open('transforms.txt', 'w')
+    for i, name in enumerate(names):
+        f.write(f'{i} {name[0]} {name[1]}')
+        f.write('\n')
     f.close()
 
     return test_transform
