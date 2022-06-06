@@ -1,4 +1,3 @@
-import wandb
 from math import floor
 
 import torch
@@ -244,8 +243,11 @@ class PonderMNIST(pl.LightningModule):
         _, _, acc, steps = self._get_loss_and_metrics(batch)
 
         # logging
-        self.log(f'test_{dataset_idx}/steps', steps)
-        self.log(f'test_{dataset_idx}/accuracy', acc)
+        f = open('results.txt', 'a')
+        f.write(f'test_{dataset_idx}/steps {steps}\n')
+        f.write(f'test_{dataset_idx}/steps {acc}\n')
+
+        f.close()
 
     def configure_optimizers(self):
         '''
@@ -275,8 +277,7 @@ class PonderMNIST(pl.LightningModule):
         # we choose high patience since we validate 4 times per epoch to have nice graphs
         early_stopping = EarlyStopping(monitor='val/accuracy', mode='max', patience=24)
         model_checkpoint = ModelCheckpoint(monitor="val/accuracy", mode='max')
-        log_predictions = LogPredictionsCallback()
-        return [early_stopping, model_checkpoint, log_predictions]
+        return [early_stopping, model_checkpoint]
 
     def _get_loss_and_metrics(self, batch):
         '''
@@ -331,27 +332,6 @@ class PonderMNIST(pl.LightningModule):
         steps = (halted_step * 1.0).mean()
 
         return loss, preds, acc, steps
-
-
-class LogPredictionsCallback(Callback):
-    '''
-        Callback to log predictions from the validation set as the model improves.
-    '''
-
-    def on_validation_batch_end(
-            self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
-        '''Called when the validation batch ends.'''
-
-        # `outputs` comes from `LightningModule.validation_step`
-        # which corresponds to our model predictions in this case
-
-        # Let's log 20 sample image predictions from first batch
-        if batch_idx == 0:
-            n = 8
-            x, y = batch
-            # we can directly use `wandb` for logging custom objects (image, video, audio, modecules and any other custom plot)
-            wandb.log({'examples': [wandb.Image(x_i, caption=f'Ground Truth: {y_i}\nPrediction: {y_pred}')
-                                    for x_i, y_i, y_pred in list(zip(x[:n], y[:n], outputs[:n]))]})
 
 
 class MLP(nn.Module):
