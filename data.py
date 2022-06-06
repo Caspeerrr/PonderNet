@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 from augmentations import gaussian_noise_transform, gaussian_blur_transform, contrast_transform, jpeg_transform, rotation_transform
 
 
-class MNIST_DataModule(pl.LightningDataModule):
+class DataModule(pl.LightningDataModule):
     '''
         DataModule to hold the MNIST dataset. Accepts different transforms for train and test to
         allow for extrapolation experiments.
