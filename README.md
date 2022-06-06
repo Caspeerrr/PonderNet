@@ -3,7 +3,7 @@ This repository contains the code used for the experiments in "Does the performa
 
 # Requirements
 
-Make sure to install the required packages with the correct version before trying to reproduce our results.
+Make sure to install the required packages with the correct version before trying to reproduce our results. This information can be found in `requirements.txt`.
 
 # Reproducing experiments
 The experiment in the paper can be reproduced by running the following command. The argument specifies the number of random seeds you want to use. `analyze.py` will also be run, which analyzes the output of the experiment and creates the plots.
