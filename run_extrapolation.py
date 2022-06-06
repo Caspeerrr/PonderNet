@@ -4,6 +4,8 @@ import argparse
 
 from pondernet import PonderMNIST
 from data import DataModule, get_transforms
+from torchvision.datasets import MNIST, CIFAR10
+
 from config import(
     BATCH_SIZE,
     EPOCHS,
@@ -18,16 +20,16 @@ from config import(
     BETA
 )
 
-def main(seed):
+def main(seed, data):
     # set seeds
     pl.seed_everything(seed)
 
-    train_transform, test_transform = get_transforms()
+    test_transform = get_transforms()
 
     # initialize datamodule and model
     mnist = DataModule(batch_size=BATCH_SIZE,
-                            train_transform=train_transform,
-                            test_transform=test_transform)
+                            test_transform=test_transform,
+                            dataset=data)
     model = PonderMNIST(n_hidden=N_HIDDEN,
                         n_hidden_cnn=N_HIDDEN_CNN,
                         n_hidden_lin=N_HIDDEN_LIN,
@@ -56,7 +58,13 @@ def main(seed):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--seed')
+    parser.add_argument('--data')
     args = parser.parse_args()
 
-    main(float(args.seed))
+    if args.data == 'cifar10':
+        data = CIFAR10
+    elif args.data == 'MNIST':
+        data = MNIST
+
+    main(float(args.seed), data)
    
